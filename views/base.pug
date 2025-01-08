@@ -1,0 +1,35 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+
+    // Stylesheets
+    link(rel='stylesheet' href='/css/style.css')
+    link(rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css' integrity='sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=' crossorigin='anonymous')
+    link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css')
+    
+    // Scripts
+    script(src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js' integrity='sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=' crossorigin='anonymous' defer)
+    script(src='/js/mapbox.js', defer, type='module')
+    script(src='/js/login.js', defer, type='module')
+    // If needed, you can keep these for axios
+    script(src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js') 
+    
+    // Favicon and Title
+    link(rel='shortcut icon' type='image/x-icon' href='/img/favicon.png')
+    title Natours | #{title}
+
+  body
+    include _header
+    block content
+      h1 This is a placeholder heading
+
+    include _footer
+    // Additional Scripts (place these at the end of body for better page load performance)
+    //script(src='https://unpkg.com/axios/dist/axios.min.js')
+
+      // script(src='https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.8/axios.min.js')
+    script(src='/js/mapbox.js', defer, type='module')
+    script(src='/js/login.js', defer, type='module')
+    script(type='module', src='/js/bundled/index.js')
