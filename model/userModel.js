@@ -60,38 +60,48 @@ const userSchema= new mongoose.Schema({
 
   })
 
-  //userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ email: 1 }, { unique: true });
 
- //userSchema.pre('save', async function(next){
+ userSchema.pre('save', async function(next){
         // only run this function if passwords was actually modified
-   // if(!this.isModified('password')) return next();
+   if(!this.isModified('password')) return next();
         // Hash the passowrd with cast of 
-     // this.password= await bcrypt.hash(this.password, 12);
+      this.password= await bcrypt.hash(this.password, 12);
 
             // Set passwordChangedAt field to the current timestamp
-     //this.passwordChangedAt = Date.now() - 1000; // Subtract 1 second for accuracy with JWT tokens
+     this.passwordChangedAt = Date.now() - 1000; // Subtract 1 second for accuracy with JWT tokens
 
-   // console.log('Password changed at:', this.passwordChangedAt);
+    console.log('Password changed at:', this.passwordChangedAt);
+    console.log('Password being hashed:', this.password);
 
 
-      //  // delete passwordConfirm field
-   // this.passwordConfirm=undefined;
-     //next();
+        // delete passwordConfirm field
+         this.passwordConfirm=undefined;
+    next();
        
 
-//});
-
+});
 
 
 userSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
-  console.log('Candidate Password:', candidatePassword);
-  console.log('Hashed Password:', userPassword);
+  try {
+    // Log for debugging
+    console.log('Candidate Password:', candidatePassword);
+    console.log('Hashed Password:', userPassword);
 
-  const isMatch = await bcrypt.compare(candidatePassword, userPassword);
-  console.log('Password Match:', isMatch);
+    // Compare the passwords
+    const isMatch = await bcrypt.compare(candidatePassword, userPassword);
 
-  return isMatch;
+    // Log the result for debugging
+    console.log('Password Match:', isMatch);
+
+    return isMatch;
+  } catch (error) {
+    console.error('Error while comparing passwords:', error);
+    throw new Error('Password comparison failed');
+  }
 };
+
 
 
   userSchema.pre(/^find/,function(next){

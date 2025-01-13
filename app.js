@@ -24,16 +24,14 @@ app.set('view engine','pug');
 app.set('views',path.join(__dirname,'views'));
 app.use(express.json()); 
 app.use(express.static(path.join(__dirname,'public')));
+//app.use('/js', express.static(path.join(__dirname, 'public')));
  // To handle JSON body in POST requests
 
 
-/// body parser reading data from the body into req.body
-app.use(express.json({limit:"10kb"}));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-app.use(cookieParser());
+
 /// api limiting   // limit requests from same api
 const limiter=rateLimit({
   max :100,               /// help us to prevent denial of service ans also brute force attacks
@@ -41,6 +39,11 @@ const limiter=rateLimit({
   message:'Too many requests from this Ip ,please try again'
 })
 app.use('/api',limiter);
+
+
+/// body parser reading data from the body into req.body
+app.use(express.json({limit:"10kb"}));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // data sanitization against NoSQL query injection
 
@@ -54,9 +57,10 @@ app.use(cors({
   origin: 'http://localhost:8000',  // Replace with your frontend URL  // Replace with your frontend URL
   credentials: true,  // Allow cookies and other credentials
 }));
+app.use(cookieParser());
 //app.use(cors());
 app.set('view cache', false);  // Disable template caching in development
-app.use(helmet());
+
 
 // prevent parameter pollution
 app.use(hpp({
@@ -64,14 +68,14 @@ app.use(hpp({
     'duration','ratingQuantity','ratingAverage','difficulty','price'
   ]
 }));
-//app.use('/js', express.static(path.join(__dirname, 'public')));
+
 app.use(
   helmet({
-      contentSecurityPolicy: {
+    contentSecurityPolicy: {
           directives: {
               'script-src': [
                   "'self'",
-                  "'unsafe-inline'",
+               "'unsafe-inline'",
                   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
                   'https://tile.openstreetmap.org',
                   'https://*.cloudflare.com',
@@ -131,6 +135,14 @@ app.use((req,res,next)=>{
 //  console.log(x);
   next();
 });
+
+
+//routes
+app.set('view cache', false);  // Disable template caching in development
+app.use((req, res, next) => {
+  console.log('User:', res.locals.user); // Log the user object after the auth check
+  next();
+});
 // routes
 
 
@@ -140,12 +152,6 @@ app.use('/api/v1/tours',tourRouter);
 app.use('/api/v1/users',userRouter);
 app.use('/api/v1/reviews',reviewRouter);
 
-//routes
-app.set('view cache', false);  // Disable template caching in development
-app.use((req, res, next) => {
-  console.log('User:', res.locals.user); // Log the user object after the auth check
-  next();
-});
 
 
 app.all('*',(req,res,next)=>{

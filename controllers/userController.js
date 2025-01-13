@@ -1,7 +1,46 @@
+
+const multer=require('multer');
 const AppError = require('../utilities/appError');
 const User=require('./../model/userModel');
 const catchAsync=require("./../utilities/catchAsync")
 const factory=require('./handlerFactory');
+
+
+
+//Define multer storage
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/users'); // Destination folder
+  },
+  filename: (req, file, cb) => {
+    // Extract file extension from mimetype
+    const ext = file.mimetype.split('/')[1]; // Extract extension like 'jpeg', 'png', etc.
+
+    if (!ext) {
+      return cb(new AppError('Invalid file type or missing extension.', 400), false);
+    }
+
+    // Generate filename with extension
+    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+  }
+});
+
+// Define multer filter
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true); // Accept image files
+  } else {
+    cb(new AppError('Not an image! Please upload only images.', 400), false); // Reject non-image files
+  }
+};
+
+// Configure multer
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+exports.uploaduserphoto=upload.single('photo');
 
 const filterObj=(obj,...allowedFields)=>{
   const newObj={};
@@ -45,6 +84,8 @@ const filterObj=(obj,...allowedFields)=>{
           
             //2 filtered out unwanted fields names that are not allowed to be updated
             const filterbody=filterObj(req.body,'name','email');
+
+            if(req.file) filterbody.photo=req.file.filename;
               //3 update the document
             const updateduser=await User.findByIdAndUpdate(req.user.id,filterbody,{
               new:true,

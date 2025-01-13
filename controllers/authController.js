@@ -22,7 +22,7 @@ const signToken=id=>{
 const createSendToken=(user,statusCode,res)=>{
 
    const token=signToken(user._id);
-   console.log('Generated JWT:', token);
+   //console.log('Generated JWT:', token);
 
    const cookieOptions = {
     expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
@@ -35,7 +35,7 @@ const createSendToken=(user,statusCode,res)=>{
   res.cookie('jwt', token, cookieOptions);
   
    user.password=undefined;
-   console.log('Cookie sent:', token);
+   //console.log('Cookie sent:', token);
 
 
    res.status(statusCode).json({
@@ -67,6 +67,8 @@ exports.signup=catchAsync(async(req,res,next)=>{
 
         
 })
+
+
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -75,6 +77,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   const trimmedEmail = email.trim().toLowerCase();
+  console.log(email,password)
 
   // Retrieve user and include password
   const user = await User.findOne({ email: trimmedEmail }).select('+password');
@@ -245,7 +248,7 @@ exports.resetpassword=catchAsync(async(req,res,next)=>{
 
     })
 
-    console.log('User found:', user);
+    //console.log('User found:', user);
 
 
    // if token has not expired ,and there is user ,set the new passdword
