@@ -71,8 +71,8 @@ userSchema.index({ email: 1 }, { unique: true });
             // Set passwordChangedAt field to the current timestamp
      this.passwordChangedAt = Date.now() - 1000; // Subtract 1 second for accuracy with JWT tokens
 
-    console.log('Password changed at:', this.passwordChangedAt);
-    console.log('Password being hashed:', this.password);
+   // console.log('Password changed at:', this.passwordChangedAt);
+    //console.log('Password being hashed:', this.password);
 
 
         // delete passwordConfirm field
@@ -86,8 +86,8 @@ userSchema.index({ email: 1 }, { unique: true });
 userSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
   try {
     // Log for debugging
-    console.log('Candidate Password:', candidatePassword);
-    console.log('Hashed Password:', userPassword);
+   // console.log('Candidate Password:', candidatePassword);
+    //console.log('Hashed Password:', userPassword);
 
     // Compare the passwords
     const isMatch = await bcrypt.compare(candidatePassword, userPassword);

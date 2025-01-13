@@ -9,6 +9,7 @@ const sendEmail=require('./../utilities/email')
 //const { use } = require('../routers/userRouters');
 
 //const { post } = require('../routers/userRouters');
+//console.log("jet secret",process.env.JWT_SECRET);
 const signToken=id=>{
     return jwt.sign({id},process.env.JWT_SECRET,{
             expiresIn:process.env.JWT_EXPIRES_IN || '1d' 
@@ -77,20 +78,22 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   const trimmedEmail = email.trim().toLowerCase();
-  console.log(email,password)
+ // console.log(email,password)
 
   // Retrieve user and include password
   const user = await User.findOne({ email: trimmedEmail }).select('+password');
   if (!user) {
-    return next(new AppError('Incorrect email or password', 401));
+    console.log('User not found for email:', trimmedEmail);
+  } else {
+    console.log('User fetched from database:', user);
   }
-
+  
   // Debugging: Log the retrieved password and candidate password
-  console.log('Candidate Password:', password);
-  console.log('Stored Hashed Password:', user.password);
+  //console.log('Candidate Password:', password);
+  //console.log('Stored Hashed Password:', user.password);
 
   const isPasswordCorrect = await user.correctPassword(password, user.password);
-  console.log('Password Match:', isPasswordCorrect);
+  //console.log('Password Match:', isPasswordCorrect);
 
   if (!isPasswordCorrect) {
     return next(new AppError('Incorrect email or password', 401));
@@ -159,7 +162,7 @@ exports.isLoggedIn = async (req, res, next) => {
  
        // 2) Check if user still exists
        const currentUser = await User.findById(decoded.id);
-       console.log(currentUser);
+      // console.log(currentUser);
        if (!currentUser) {
          return next();
        }
@@ -239,8 +242,8 @@ exports.resetpassword=catchAsync(async(req,res,next)=>{
 
 
     const hashedToken=crypto.createHash('sha256').update(req.params.token).digest('hex');
-    console.log('Provided token:', req.params.token);
-     console.log('Hashed token (to search in DB):', hashedToken);
+    //console.log('Provided token:', req.params.token);
+    // console.log('Hashed token (to search in DB):', hashedToken);
     
     const user=await User.findOne({
       passwordResetToken:hashedToken,
